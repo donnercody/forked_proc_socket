@@ -1,0 +1,30 @@
+{
+  "name": "forked_proc_socket",
+  "version": "1.0.0",
+  "description": "Start a process by arguments and open a websocket to read stdout, stderr and the exit codes",
+  "main": "./index.js",
+  "bin": "./index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/donnercody/forked_proc_socket.git"
+  },
+  "keywords": [
+    "fork",
+    "node",
+    "process",
+    "websocket",
+    "spawn"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/donnercody/forked_proc_socket/issues"
+  },
+  "homepage": "https://github.com/donnercody/forked_proc_socket#readme",
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
