@@ -1,9 +1,6 @@
-/**
- * @fileoverview This is the main file which stars a child process
- */
-
-const fs = require('fs');
+#! /usr/bin/env node
 const { spawn, exec } = require('child_process');
+const fs = require('fs');
 const ws = require('ws');
 
 let randomWebsocketPort =  Math.floor(Math.random() * 1000) + 9000;
