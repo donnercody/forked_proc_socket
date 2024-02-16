@@ -1,6 +1,6 @@
 {
   "name": "forked_proc_socket",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Start a process by arguments and open a websocket to read stdout, stderr and the exit codes",
   "main": "bin/index.js",
   "bin": {

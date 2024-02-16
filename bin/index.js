@@ -32,7 +32,14 @@ wss.on('connection', (ws) => {
         type: 'connected'
     }))
     ws.on('message', (message) => {
-
+        console.log('received: %s', message.toString());
+        try {
+            const msgdata = JSON.parse(message);
+            if (msgdata.command == "exit") {
+                process.exit(0);
+            }
+        }
+        catch(e) {}
     });
     ws.on('close', () => {
         console.log('Client disconnected');
