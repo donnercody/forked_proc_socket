@@ -26,6 +26,14 @@ const listOfClients = [];
 
 // Start a websocket server and write the port to a file
 const wss = new ws.Server({ port: randomWebsocketPort });
+
+
+
+const current_args = process.argv.slice(2);
+const child = exec(current_args.join(" "), {
+   stdio: "pipe"
+})
+
 wss.on('connection', (ws) => {
     listOfClients.push(ws);
     ws.send(JSON.stringify({
@@ -36,6 +44,8 @@ wss.on('connection', (ws) => {
         try {
             const msgdata = JSON.parse(message);
             if (msgdata.command == "exit") {
+                child.stdin.pause();
+                child.kill();
                 process.exit(0);
             }
         }
@@ -51,12 +61,6 @@ wss.on('close', () => {
     console.log('Websocket server closed');
 });
 
-
-
-const current_args = process.argv.slice(2);
-const child = exec(current_args.join(" "), {
-   stdio: "pipe"
-})
 child.stdout.on('data', (data) => {
     listOfClients.forEach(client => {
         client.send(JSON.stringify({
