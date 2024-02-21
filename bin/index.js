@@ -28,14 +28,9 @@ const listOfClients = [];
 const wss = new ws.Server({ port: randomWebsocketPort });
 
 
-
-const current_args = process.argv.slice(2);
-const child = exec(current_args.join(" "), {
-   stdio: "pipe"
-})
-
 wss.on('connection', (ws) => {
     listOfClients.push(ws);
+    let child = null;
     ws.send(JSON.stringify({
         type: 'connected'
     }))
@@ -48,6 +43,43 @@ wss.on('connection', (ws) => {
                 child.kill();
                 process.exit(0);
             }
+            else if (msgdata.command == "start") {
+                if (!child) {
+                    const current_args = process.argv.slice(2);
+                    child = exec(current_args.join(" "), {
+                        stdio: "pipe"
+                    })
+
+                    child.stdout.on('data', (data) => {
+                        listOfClients.forEach(client => {
+                            client.send(JSON.stringify({
+                                type: 'stdout',
+                                data: data.toString()
+                            }));
+                        });
+                    });
+                    child.stderr.on('data', (data) => {
+                        listOfClients.forEach(client => {
+                            client.send(JSON.stringify({
+                                type: 'stderr',
+                                data: data.toString()
+                            }));
+                        });
+                    });
+                    child.on('close', (code) => {
+                        listOfClients.forEach(client => {
+                            client.send(JSON.stringify({
+                                type: 'close',
+                                data: code
+                            }));
+                        });
+                        console.log(`child process exited with code ${code}`);
+                        process.exit(code);
+                    });
+                }
+
+
+            }
         }
         catch(e) {}
     });
@@ -59,33 +91,6 @@ wss.on('connection', (ws) => {
 
 wss.on('close', () => {
     console.log('Websocket server closed');
-});
-
-child.stdout.on('data', (data) => {
-    listOfClients.forEach(client => {
-        client.send(JSON.stringify({
-            type: 'stdout',
-            data: data.toString()
-        }));
-    });
-});
-child.stderr.on('data', (data) => {
-    listOfClients.forEach(client => {
-        client.send(JSON.stringify({
-            type: 'stderr',
-            data: data.toString()
-        }));
-    });
-});
-child.on('close', (code) => {
-    listOfClients.forEach(client => {
-        client.send(JSON.stringify({
-            type: 'close',
-            data: code
-        }));
-    });
-    console.log(`child process exited with code ${code}`);
-    process.exit(code);
 });
 
 
