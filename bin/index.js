@@ -39,8 +39,10 @@ wss.on('connection', (ws) => {
         try {
             const msgdata = JSON.parse(message);
             if (msgdata.command == "exit") {
-                child.stdin.pause();
-                child.kill();
+                if (child) {
+                    child.stdin.pause();
+                    child.kill();
+                }
                 process.exit(0);
             }
             else if (msgdata.command == "start") {
