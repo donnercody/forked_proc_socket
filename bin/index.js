@@ -32,16 +32,22 @@ wss.on('connection', (ws) => {
     listOfClients.push(ws);
     let child = null;
     ws.send(JSON.stringify({
-        type: 'connected'
+        type: 'connected',
+        status: child ? 'running' : 'stopped'
     }))
     ws.on('message', (message) => {
         console.log('received: %s', message.toString());
         try {
             const msgdata = JSON.parse(message);
             if (msgdata.command == "exit") {
-                if (child) {
-                    child.stdin.pause();
-                    child.kill();
+                try {
+                    if (child) {
+                        child.stdin.pause();
+                        child.kill();
+                    }
+                }
+                catch(e) {
+
                 }
                 process.exit(0);
             }
@@ -69,14 +75,19 @@ wss.on('connection', (ws) => {
                         });
                     });
                     child.on('close', (code) => {
-                        listOfClients.forEach(client => {
-                            client.send(JSON.stringify({
-                                type: 'close',
-                                data: code
-                            }));
-                        });
+                        try {
+                            listOfClients.forEach(client => {
+                                client.send(JSON.stringify({
+                                    type: 'close',
+                                    data: code
+                                }));
+                            });
+                        }
+                        catch(e) {
+
+                        }
                         console.log(`child process exited with code ${code}`);
-                        process.exit(code);
+                        process.exit(0);
                     });
                 }
 
